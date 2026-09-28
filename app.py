@@ -4,7 +4,7 @@ import google.generativeai as genai
 # Streamlit Secrets에서 API 키 불러오기 (또는 직접 입력)
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-st.title("📚 영문 학술지 집필 AI 어시스턴")
+st.title("📚 영문 학술지 집필 AI 어시스턴트")
 st.write("자신의 진로와 관심사, 평균 영어 등급을 입력하면 AI가 맞춤형 영문 학술 자료를 추천해 드립니다.")
 
 # 학생 입력 폼
