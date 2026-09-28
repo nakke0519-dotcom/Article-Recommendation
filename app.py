@@ -1,8 +1,9 @@
 import streamlit as st
 import google.generativeai as genai
-import time
 
-# Streamlit Secrets에서 API 키 불러오기
+st.set_page_config(page_title="고2 영어 수행평가 추천 시스템", layout="centered")
+
+# 🔑 Streamlit Secrets에서 API 키 불러오기
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 st.title("📚 영문 학술지 집필 AI 어시스턴트")
@@ -17,9 +18,8 @@ if st.button("추천 자료 검색하기"):
     if not major or not details:
         st.warning("희망 분야와 관심 내용을 모두 입력해 주세요.")
     else:
-        with st.spinner("학생의 실제 영어 독해 수준에 맞는 최적의 자료를 찾고 있습니다..."):
+        with st.spinner("구글 실시간 검색을 통해 학생 수준에 맞는 최적의 실제 아티클을 찾고 있습니다..."):
             
-            # 고2 현실적 수준에 맞춘 난이도 지침
             difficulty_guide = {
                 "1~2등급": """
                     - 수준: 고교 영어 수능/모의고사 1등급 수준 ~ 청소년/교양 과학·시사 아티클 수준
@@ -40,7 +40,7 @@ if st.button("추천 자료 검색하기"):
             
             prompt = f"""
             너는 대한민국 고등학교 2학년 학생들의 영어 수행평가를 돕는 친절한 영어 교육 전문가이자 탐구 멘토야.
-            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 아래 학생의 조건에 꼭 맞는 영문 아티클 및 학술 자료 3가지를 추천해줘.
+            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 실제로 웹상에 존재하는 영문 아티클 및 학술 자료 3가지를 구글 검색을 통해 찾아서 추천해줘.
 
             [학생 정보]
             - 희망 진로: {major}
@@ -62,28 +62,16 @@ if st.button("추천 자료 검색하기"):
               1) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 1)
               2) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 2)
               3) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 3)
-            - **원문 바로가기 (링크)**: (해당 아티클을 바로 읽을 수 있는 실제 웹 URL)
+            - **원문 바로가기 (링크)**: (실제 검색을 통해 확인된 클릭 가능한 원문 웹 URL)
             """
 
-            # 사용자가 설정하신 gemini-3.8-flash 모델 사용
-            model = genai.GenerativeModel('gemini-3.8-flash')
-            
-            # 분당 5회 제한(429 오류)을 방지하기 위한 자동 재시도 루프
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    response = model.generate_content(prompt)
-                    st.success("학생 수준에 맞춘 추천 자료가 준비되었습니다!")
-                    st.markdown(response.text)
-                    break
-                except Exception as e:
-                    error_msg = str(e)
-                    if "429" in error_msg or "Quota" in error_msg or "ResourceExhausted" in error_msg:
-                        if attempt < max_retries - 1:
-                            st.info("요청이 몰려 10초 후 자동으로 재시도합니다. 잠시만 기다려 주세요...")
-                            time.sleep(10)
-                        else:
-                            st.error("Google API 분당 사용 한도에 도달했습니다. 약 30초 후 다시 '추천 자료 검색하기' 버튼을 눌러주세요.")
-                    else:
-                        st.error(f"오류가 발생했습니다: {e}")
-                        break
+            try:
+                # tools='google_search_retrieval'을 추가하여 실시간 웹 검색 기반 결과 생성
+                model = genai.GenerativeModel('gemini-3.8-flash', tools='google_search_retrieval')
+                response = model.generate_content(prompt)
+                
+                st.success("학생 수준에 맞춘 실제 추천 자료가 준비되었습니다!")
+                st.markdown(response.text)
+                
+            except Exception as e:
+                st.error(f"오류가 발생했습니다: {e}")
