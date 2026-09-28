@@ -1,6 +1,5 @@
 import streamlit as st
 import google.generativeai as genai
-import urllib.parse
 
 st.set_page_config(page_title="영문 학술지 집필 AI 어시스턴트", layout="centered")
 
@@ -20,7 +19,7 @@ if st.button("추천 자료 검색하기"):
     if not major or not details:
         st.warning("희망 분야와 관심 내용을 모두 입력해 주세요.")
     else:
-        with st.spinner("학생 수준에 맞는 최적의 영문 아티클을 분석 및 추천 중입니다..."):
+        with st.spinner("학생 수준에 맞는 최적의 실제 영문 아티클을 찾아 원문 링크를 구성 중입니다..."):
             
             difficulty_guide = {
                 "1~2등급": """
@@ -42,7 +41,7 @@ if st.button("추천 자료 검색하기"):
             
             prompt = f"""
             너는 대한민국 고등학교 2학년 학생들의 영어 수행평가를 돕는 친절한 영어 교육 전문가이자 탐구 멘토야.
-            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 실제로 존재하는 대표적인 영문 아티클 3가지를 구체적이고 정확한 제목으로 추천해줘.
+            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 실제 존재하는 특정 영문 아티클 3가지를 구체적인 정확한 영문 풀제목과 함께 추천해줘.
 
             [학생 정보]
             - 희망 진로: {major}
@@ -52,6 +51,11 @@ if st.button("추천 자료 검색하기"):
             [난이도 설정 지침 - 매우 중요!]
             {difficulty_guide[grade]}
             ※ 주의: 실제 학술 논문 원문(Abstract 포함)이나 전문 학술지(Nature, Science 등)는 고등학생에게 너무 어려우므로 절대로 추천하지 마. 학생들이 직접 독해할 수 있는 청소년/대중용 과학·시사 아티클 위주로 추천할 것.
+
+            [원문 바로가기 링크 작성 규칙 - 매우 중요!]
+            - 각 기사마다 아래 마크다운 방식을 정확히 따라 클릭 가능한 직접 이동 링크를 생성해줘.
+            - 링크 형식: [👉 원문 기사 바로 읽기](https://www.google.com/search?q=영문출처명+영문기사풀제목)
+            - 예시: [👉 원문 기사 바로 읽기](https://www.google.com/search?q=Science+News+Explores+How+Gene+Editing+Works)
 
             [응답 양식]
             각 추천 자료마다 아래 형식에 정확히 맞추어 한국어로 작성해줘:
@@ -64,20 +68,15 @@ if st.button("추천 자료 검색하기"):
               1) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 1)
               2) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 2)
               3) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 3)
-            - **기사 원문 검색 키워드**: (기사 제목과 매체명을 포함한 영문 검색 키워드 단일행)
+            - **원문 바로가기**: [👉 원문 기사 바로 읽기](https://www.google.com/search?q=출처명+기사제목)
             """
 
             try:
                 model = genai.GenerativeModel('gemini-3.8-flash')
                 response = model.generate_content(prompt)
                 
-                # 결과 텍스트 파싱하여 실제 원문 구글 직접 연결 링크 자동 생성
-                result_text = response.text
-                
-                st.success("학생 수준에 맞춘 최적의 추천 아티클이 준비되었습니다!")
-                st.markdown(result_text)
-                
-                st.info("💡 **원문 읽기 안내**: 각 기사의 제목을 누르면 구글 검색을 통해 해당 원문 기사 페이지로 즉시 연결됩니다.")
+                st.success("학생 수준에 맞춘 추천 아티클과 원문 바로가기 링크가 준비되었습니다!")
+                st.markdown(response.text)
                 
             except Exception as e:
                 st.error(f"오류가 발생했습니다: {e}")
