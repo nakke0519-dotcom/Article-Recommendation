@@ -67,7 +67,7 @@ if st.button("추천 자료 검색하기"):
 
             try:
                 # tools='google_search_retrieval'을 추가하여 실시간 웹 검색 기반 결과 생성
-                model = genai.GenerativeModel('gemini-3.8-flash', tools='google_search')
+                model = genai.GenerativeModel('gemini-3.8-flash', tools=[{"google_search": {}}])
                 response = model.generate_content(prompt)
                 
                 st.success("학생 수준에 맞춘 실제 추천 자료가 준비되었습니다!")
