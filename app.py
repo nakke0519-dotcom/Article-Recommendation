@@ -66,7 +66,7 @@ if st.button("추천 자료 검색하기"):
             """
 
             # 사용자가 설정하신 gemini-3.8-flash 모델 사용
-            model = genai.GenerativeModel('gemini-3.8-flash')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             # 분당 5회 제한(429 오류)을 방지하기 위한 자동 재시도 루프
             max_retries = 3
