@@ -1,14 +1,14 @@
 import streamlit as st
 import google.generativeai as genai
-from google.generativeai.types import Tool, GoogleSearch
 
-st.set_page_config(page_title="고2 영어 수행평가 추천 시스템", layout="centered")
+st.set_page_config(page_title="영문 학술지 집필 AI 어시스턴트", layout="centered")
 
-# 🔑 Streamlit Secrets에서 선생님의 개인 유료 API 키를 불러옵니다.
+# 🔑 Streamlit Secrets에서 선생님의 개인 API 키를 불러옵니다.
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
+# 수정된 타이틀 및 하단 설명 문구
 st.title("📚 영문 학술지 집필 AI 어시스턴트")
-st.write("진로 및 관심사와 영어 등급을 입력하면, 적절한 수준의 영문 아티클을 추천해 드립니다.")
+st.write("진로 및 관심사와 영어 등급을 입력하면, 직접 읽고 분석할 수 있는 적절한 수준의 영문 아티클을 추천해 드립니다.")
 
 # 학생 입력 폼
 major = st.text_input("희망 분야 / 전공 / 진로", placeholder="예: 생명공학, 컴퓨터공학, 경영학, 미디어학 등")
@@ -67,10 +67,7 @@ if st.button("추천 자료 검색하기"):
             """
 
             try:
-                # 구글 검색 공식 객체 활용
-                search_tool = Tool(google_search=GoogleSearch())
-                model = genai.GenerativeModel('gemini-3.8-flash', tools=[search_tool])
-                
+                model = genai.GenerativeModel('gemini-3.8-flash', tools=[{"google_search_retrieval": {}}])
                 response = model.generate_content(prompt)
                 
                 st.success("학생 수준에 맞춘 실제 추천 자료가 준비되었습니다!")
