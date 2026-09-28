@@ -8,10 +8,10 @@ genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 # 타이틀 및 하단 설명
 st.title("📚 영문 학술지 집필 AI 어시스턴트")
-st.write("진로 및 관심사와 영어 등급을 입력하면, 직접 읽고 분석할 수 있는 적절한 수준의 영문 아티클을 추천해 드립니다.")
+st.write("관심 분야와 영어 등급을 입력하면, 적절한 수준의 영문 아티클을 추천해 드립니다.")
 
 # 학생 입력 폼
-major = st.text_input("희망 분야 / 전공 / 진로", placeholder="예: 생명공학, 컴퓨터공학, 경영학, 미디어학 등")
+major = st.text_input("희망 분야 / 전공 / 진로", placeholder="예: 생명공학, 컴퓨터공학, 경영학, 체육 등")
 details = st.text_area("관심 있는 구체적 내용", placeholder="예: 유전자 가위 기술의 윤리적 문제, 인공지능과 저작권, 마케팅 심리학 등")
 grade = st.selectbox("2학년 영어 모의고사 평균 등급", ["1~2등급", "3~4등급", "5등급 이하"])
 
