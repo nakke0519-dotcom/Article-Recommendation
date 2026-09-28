@@ -63,7 +63,7 @@ if st.button("추천 자료 검색하기"):
             """
 
             try:
-                model = genai.GenerativeModel('gemini-2.0-flash')
+                model = genai.GenerativeModel('gemini-3.8-flash')
                 response = model.generate_content(prompt)
                 
                 st.success("학생 수준에 맞춘 추천 자료가 준비되었습니다!")
