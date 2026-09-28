@@ -159,8 +159,8 @@ if st.session_state.step1_result:
                 """
 
                 try:
-                    model = genai.GenerativeModel('gemini-3.8-flash')
-                    response_step2 = model.generate_content(prompt_step2)
+model = genai.GenerativeModel('gemini-3.1-flash-lite')
+response_step2 = model.generate_content(prompt_step2)
                     
                     st.success("학생만의 주도적 탐구 플랜이 성공적으로 생성되었습니다!")
                     st.markdown(response_step2.text)
