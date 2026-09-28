@@ -157,10 +157,9 @@ if st.session_state.step1_result:
                 - **III. 본론 2 (Active Investigation)**: (학생이 진행한 추가 활동/조사 결과)
                 - **IV. 결론 및 제언 (Conclusion)**: (시사점 및 영문 느낀 점 작성 방향)
                 """
-
                 try:
-model = genai.GenerativeModel('gemini-3.1-flash-lite')
-response_step2 = model.generate_content(prompt_step2)
+                    model = genai.GenerativeModel('gemini-3.1-flash-lite')
+                    response_step2 = model.generate_content(prompt_step2)
                     
                     st.success("학생만의 주도적 탐구 플랜이 성공적으로 생성되었습니다!")
                     st.markdown(response_step2.text)
