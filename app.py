@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import time
 
 # Streamlit Secrets에서 API 키 불러오기
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
@@ -64,11 +65,25 @@ if st.button("추천 자료 검색하기"):
             - **원문 바로가기 (링크)**: (해당 아티클을 바로 읽을 수 있는 실제 웹 URL)
             """
 
-            try:
-                model = genai.GenerativeModel('gemini-3.8-flash')
-                response = model.generate_content(prompt)
-                
-                st.success("학생 수준에 맞춘 추천 자료가 준비되었습니다!")
-                st.markdown(response.text)
-            except Exception as e:
-                st.error(f"오류가 발생했습니다: {e}")
+            # 사용자가 설정하신 gemini-3.8-flash 모델 사용
+            model = genai.GenerativeModel('gemini-3.8-flash')
+            
+            # 분당 5회 제한(429 오류)을 방지하기 위한 자동 재시도 루프
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    response = model.generate_content(prompt)
+                    st.success("학생 수준에 맞춘 추천 자료가 준비되었습니다!")
+                    st.markdown(response.text)
+                    break
+                except Exception as e:
+                    error_msg = str(e)
+                    if "429" in error_msg or "Quota" in error_msg or "ResourceExhausted" in error_msg:
+                        if attempt < max_retries - 1:
+                            st.info("요청이 몰려 10초 후 자동으로 재시도합니다. 잠시만 기다려 주세요...")
+                            time.sleep(10)
+                        else:
+                            st.error("Google API 분당 사용 한도에 도달했습니다. 약 30초 후 다시 '추천 자료 검색하기' 버튼을 눌러주세요.")
+                    else:
+                        st.error(f"오류가 발생했습니다: {e}")
+                        break
