@@ -42,7 +42,7 @@ if st.button("추천 자료 검색하기"):
             """
 
             # Gemini 모델 호출
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel('gemini-3.8-flash')
             response = model.generate_content(prompt)
             
             st.success("추천이 완료되었습니다!")
