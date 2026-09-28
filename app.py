@@ -6,7 +6,7 @@ st.set_page_config(page_title="영문 학술지 집필 AI 어시스턴트", layo
 # 🔑 Streamlit Secrets에서 선생님의 개인 API 키를 불러옵니다.
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# 수정된 타이틀 및 하단 설명 문구
+# 요청하신 수정 반영 (타이틀 및 설명)
 st.title("📚 영문 학술지 집필 AI 어시스턴트")
 st.write("진로 및 관심사와 영어 등급을 입력하면, 직접 읽고 분석할 수 있는 적절한 수준의 영문 아티클을 추천해 드립니다.")
 
@@ -19,7 +19,7 @@ if st.button("추천 자료 검색하기"):
     if not major or not details:
         st.warning("희망 분야와 관심 내용을 모두 입력해 주세요.")
     else:
-        with st.spinner("구글 실시간 검색을 통해 학생 수준에 맞는 최적의 실제 아티클을 찾고 있습니다..."):
+        with st.spinner("학생 수준에 맞는 최적의 실제 영문 아티클을 검색하여 정리 중입니다..."):
             
             difficulty_guide = {
                 "1~2등급": """
@@ -41,7 +41,7 @@ if st.button("추천 자료 검색하기"):
             
             prompt = f"""
             너는 대한민국 고등학교 2학년 학생들의 영어 수행평가를 돕는 친절한 영어 교육 전문가이자 탐구 멘토야.
-            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 실제로 웹상에 존재하는 영문 아티클 및 학술 자료 3가지를 구글 검색을 통해 찾아서 추천해줘.
+            학생이 스스로 읽고 요약/분석하여 '자신만의 영문 학술지'를 집필할 수 있도록, 웹상에 실제로 존재하는 대표적인 영문 아티클 및 학술 자료 3가지를 찾아서 추천해줘.
 
             [학생 정보]
             - 희망 진로: {major}
@@ -50,7 +50,7 @@ if st.button("추천 자료 검색하기"):
 
             [난이도 설정 지침 - 매우 중요!]
             {difficulty_guide[grade]}
-            ※ 주의: 실제 학술 논문 원문(Abstract 포함)이나 전문 학술지(Nature, Science 등)는 고등학생에게 너무 어려우므로 절대로 추천하지 마. 학생들이 사전의 도움을 받아 직접 독해할 수 있는 청소년/대중용 과학·시사 아티클 위주로 추천할 것.
+            ※ 주의: 실제 학술 논문 원문(Abstract 포함)이나 전문 학술지(Nature, Science 등)는 고등학생에게 너무 어려우므로 절대로 추천하지 마. 학생들이 직접 독해할 수 있는 청소년/대중용 과학·시사 아티클 위주로 추천할 것.
 
             [응답 양식]
             각 추천 자료마다 아래 형식에 정확히 맞추어 한국어로 친절하게 작성해줘:
@@ -63,14 +63,15 @@ if st.button("추천 자료 검색하기"):
               1) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 1)
               2) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 2)
               3) (학생이 보고서나 영문 학술지를 쓸 때 다룰 만한 핵심 질문 또는 탐구 주제 3)
-            - **원문 바로가기 (링크)**: (실제 검색을 통해 확인된 클릭 가능한 원문 웹 URL)
+            - **원문 바로가기 (링크)**: (실제 접속 가능한 웹 URL, 또는 출처 사이트 메인 페이지 URL)
             """
 
             try:
-                model = genai.GenerativeModel('gemini-3.8-flash', tools=[{"google_search_retrieval": {}}])
+                # tools 옵션을 제거하여 400 에러 및 SDK 파싱 오류를 근본적으로 방지
+                model = genai.GenerativeModel('gemini-3.8-flash')
                 response = model.generate_content(prompt)
                 
-                st.success("학생 수준에 맞춘 실제 추천 자료가 준비되었습니다!")
+                st.success("학생 수준에 맞춘 추천 자료가 준비되었습니다!")
                 st.markdown(response.text)
                 
             except Exception as e:
